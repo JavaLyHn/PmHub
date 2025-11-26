@@ -17,10 +17,13 @@ import org.apache.rocketmq.client.apis.message.Message;
 import org.apache.rocketmq.client.apis.producer.Producer;
 import org.apache.rocketmq.client.apis.producer.SendReceipt;
 import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.websocket.SendResult;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * RocketMQ连接工具
@@ -98,7 +101,13 @@ public class RocketMqUtils {
             //LogFactory.get().info("Send message successfully, messageId={}", sendReceipt.getMessageId());
 
             // 模拟异步发送
-
+            CompletableFuture<SendReceipt> sendAsync = producer.sendAsync(message);
+            sendAsync.thenAccept(sendReceipt -> {
+                System.out.println("发送成功：" + sendReceipt.getMessageId());
+            }).exceptionally(throwable -> {
+                System.out.println("发送失败：" + throwable.getMessage());
+                return null;
+            });
             producer.close();
         } catch (ClientException | IOException e) {
             LogFactory.get().error("推送微信消息时发生错误：", e);
