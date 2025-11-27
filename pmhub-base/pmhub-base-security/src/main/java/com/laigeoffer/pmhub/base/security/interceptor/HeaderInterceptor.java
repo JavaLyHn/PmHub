@@ -45,6 +45,13 @@ public class HeaderInterceptor implements AsyncHandlerInterceptor {
             return true;
         }
 
+        // 将请求头的用户信息放到TTL中
+        /*
+         *  TTL实现原理
+         *  1、 上下文拷贝：在任务提交时，TTL会拷贝当前线程的上下文到任务中
+         *  2、 任务执行前设置上下文：在任务执行前，TTL会将拷贝的上下文设置到当前线程中
+         *  3、 任务执行后情理上下文：在任务执行后，TTL会清理线程中的上下文，防止内存泄漏
+         */
         SecurityContextHolder.setUserId(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USER_ID));
         SecurityContextHolder.setUserName(ServletUtils.getHeader(request, SecurityConstants.DETAILS_USERNAME));
         SecurityContextHolder.setUserKey(ServletUtils.getHeader(request, SecurityConstants.USER_KEY));
